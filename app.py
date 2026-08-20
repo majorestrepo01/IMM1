@@ -2,7 +2,7 @@ import streamlit as st
 import os
 import time
 import glob
-from gTTS import gTTS
+from gtts import gTTS
 from PIL import Image
 import base64
 from googletrans import Translator # <--- Usando tu librería googletrans
