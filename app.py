@@ -2,10 +2,10 @@ import streamlit as st
 import os
 import time
 import glob
-from gtts import gTTS
+from gTTS import gTTS
 from PIL import Image
 import base64
-from deep_translator import GoogleTranslator # <--- Añadido
+from googletrans import Translator # <--- Usando tu librería googletrans
 
 st.title("Traducción de cuentos")
 image = Image.open('Gatoyraton.JPG')
@@ -28,13 +28,17 @@ st.write('¡Ay! -dijo el ratón-. El mundo se hace cada día más pequeño. Al p
         )
             
 st.markdown(f"Quieres escucharlo en inglés?, copia el texto")
-text = st.text_area("Ingrese el texto en español a escuchar.")
+text = st.text_area("Ingrese El texto a escuchar.")
+
+# Inicializamos el traductor de googletrans
+translator = Translator()
 
 def text_to_speech(text):
-    # Traduce el texto de español ('es') a inglés ('en')
-    translated_text = GoogleTranslator(source='es', target='en').translate(text)
+    # Traduce el texto del español al inglés
+    translation = translator.translate(text, src='es', dest='en')
+    translated_text = translation.text
     
-    # Genera el audio en inglés
+    # Genera el audio usando el texto traducido y con idioma inglés ('en')
     tts = gTTS(translated_text, lang='en')
     
     try:
@@ -45,16 +49,16 @@ def text_to_speech(text):
     tts.save(f"temp/{my_file_name}.mp3")
     return my_file_name, translated_text
 
-if st.button("Convertir a Audio (Inglés)"):
+if st.button("convertir a Audio"):
     if text.strip():
         result, output_text = text_to_speech(text)
         audio_file = open(f"temp/{result}.mp3", "rb")
         audio_bytes = audio_file.read()
         
-        st.markdown(f"## Texto traducido:")
+        st.markdown(f"## Texto traducido al inglés:")
         st.write(output_text)
         
-        st.markdown(f"## Tu audio en inglés:")
+        st.markdown(f"## Tú audio:")
         st.audio(audio_bytes, format="audio/mp3", start_time=0)
 
         with open(f"temp/{result}.mp3", "rb") as f:
@@ -66,7 +70,7 @@ if st.button("Convertir a Audio (Inglés)"):
             return href
         st.markdown(get_binary_file_downloader_html("audio.mp3", file_label="Audio File"), unsafe_allow_html=True)
     else:
-        st.warning("Por favor ingresa un texto.")
+        st.warning("Por favor ingresa un texto antes de convertir.")
 
 def remove_files(n):
     mp3_files = glob.glob("temp/*mp3")
